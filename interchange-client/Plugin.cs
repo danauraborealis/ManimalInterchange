@@ -15,6 +15,7 @@ namespace Manimal.Interchange.Client;
 
 [BepInPlugin(ModIdentity.Guid, ModIdentity.ClientName, ModIdentity.Version)]
 [BepInDependency("com.arys.unitytoolkit", ModIdentity.ToolkitMinimumVersion)]
+[BepInDependency("xyz.drakia.waypoints", BepInDependency.DependencyFlags.SoftDependency)]
 [BepInDependency("com.acidphantasm.botplacementsystem", BepInDependency.DependencyFlags.SoftDependency)]
 public sealed class Plugin : BaseUnityPlugin
 {
@@ -88,6 +89,7 @@ public sealed class Plugin : BaseUnityPlugin
         NativeShaderBindings.Enable();
         SceneManager.sceneUnloaded += AreaLightBindings.SceneUnloaded;
         SceneManager.sceneUnloaded += SceneLoader.SceneUnloaded;
+        InterchangeWaypointsCompatibility.EnableIfAvailable();
         InterchangeBotPlacementCompatibility.EnableIfAvailable();
         Log.LogInfo(ModIdentity.ClientName + " " + ModIdentity.Version + ": replacement content requires a matching server manifest.");
     }
