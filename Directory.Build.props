@@ -1,13 +1,12 @@
-<Project>
+﻿<Project>
   <PropertyGroup>
-    <ModVersion>0.1.0</ModVersion>
+    <ModVersion>1.0.2</ModVersion>
     <ModGuid>com.manimal.interchange</ModGuid>
     <ModUsername>Manimal</ModUsername>
     <ModDisplayName>InterchangeRework</ModDisplayName>
     <ModClientName>$(ModUsername)-$(ModDisplayName)</ModClientName>
     <ModServerName>$(ModUsername)$(ModDisplayName)</ModServerName>
-    <!-- No source repository has been supplied or published for this project. -->
-    <ModSourceUrl></ModSourceUrl>
+    <ModSourceUrl>https://github.com/danauraborealis/ManimalInterchange</ModSourceUrl>
     <ModPackageName>$(ModUsername)-Interchange</ModPackageName>
     <TargetClientBuild>0.16.9.40743</TargetClientBuild>
     <SupportedSptRange>~4.1.5</SupportedSptRange>

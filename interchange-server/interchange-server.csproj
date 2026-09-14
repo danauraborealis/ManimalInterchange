@@ -1,6 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup><TargetFramework>net10.0</TargetFramework><ImplicitUsings>enable</ImplicitUsings><AssemblyName>ManimalInterchange.Server</AssemblyName><Version>$(ModVersion)</Version></PropertyGroup>
   <ItemGroup>
+    <!-- retail loading-screen banners SPT 4.1.5 does not ship; served by InterchangeBannerCompatibility -->
+    <EmbeddedResource Include="Resources/banners/*.jpg" LogicalName="Manimal.Interchange.Banners.%(Filename)%(Extension)" />
+    <EmbeddedResource Include="Resources/banners/captions-en.json" LogicalName="Manimal.Interchange.Banners.captions-en.json" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="../interchange-shared/interchange-shared.csproj" />
     <Reference Include="SPTarkov.Server.Core"><HintPath>$(ReferenceRoot)/SPT_Runtime/SPTarkov.Server.Core.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="SPTarkov.Common"><HintPath>$(ReferenceRoot)/SPT_Runtime/SPTarkov.Common.dll</HintPath><Private>false</Private></Reference>

@@ -8,6 +8,8 @@
 !/NuGet.Config
 !/README.md
 !/build.ps1
+!/package-release.ps1
+!/package-release.cmd
 !/interchange-client/
 !/interchange-server/
 !/interchange-shared/

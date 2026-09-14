@@ -22,6 +22,8 @@ public sealed class Plugin : BaseUnityPlugin
     internal static ManualLogSource Log = null!;
     internal static ConfigEntry<bool> AllowProbe = null!;
     internal static ConfigEntry<bool> AllowFullMapTest = null!;
+    internal static ConfigEntry<bool> RebindNativeShaders = null!;
+    internal static ConfigEntry<bool> RebindMaterialShaders = null!;
     private CancellationTokenSource? _probeCancellation;
     public string ProbeStatus { get; private set; } = "idle";
     public string ProbeReport { get; private set; } = "";
@@ -40,6 +42,8 @@ public sealed class Plugin : BaseUnityPlugin
         Log = Logger;
         AllowProbe = Config.Bind("Development", "AllowLoaderProbe", false, "Allow explicit menu-only scene loading tests through the AI Bridge.");
         AllowFullMapTest = Config.Bind("Development", "AllowFullMapTest", false, "Allow full replacement raids with a matching server test manifest.");
+        RebindNativeShaders = Config.Bind("Rendering", "RebindNativeShaders", true, "Point the map's screen-space helper shaders (ambient, wet, tonemapper) at the game's own copies instead of the bundled retail programs.");
+        RebindMaterialShaders = Config.Bind("Rendering", "RebindMaterialShaders", true, "Point map materials at the game's own shader of the same name where one exists.");
         new LoadPresetReversePatch().Enable();
         new LoadPresetPatch().Enable();
         new BundledScenePatch().Enable();
@@ -81,6 +85,7 @@ public sealed class Plugin : BaseUnityPlugin
         FlareExitBindings.Enable();
         SeasonBindings.Enable();
         TriggerRelayBindings.Enable();
+        NativeShaderBindings.Enable();
         SceneManager.sceneUnloaded += AreaLightBindings.SceneUnloaded;
         SceneManager.sceneUnloaded += SceneLoader.SceneUnloaded;
         InterchangeBotPlacementCompatibility.EnableIfAvailable();

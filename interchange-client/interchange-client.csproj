@@ -11,6 +11,7 @@
     <Reference Include="UniTask"><HintPath>$(ReferenceRoot)/BepInEx/plugins/UnityToolkit/UniTask.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="ZLinq"><HintPath>$(ReferenceRoot)/BepInEx/plugins/UnityToolkit/ZLinq.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="Assembly-CSharp"><HintPath>$(FrozenManaged)/Assembly-CSharp.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Assembly-CSharp-firstpass"><HintPath>$(FrozenManaged)/Assembly-CSharp-firstpass.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="Meta.XR.Audio"><HintPath>$(FrozenManaged)/Meta.XR.Audio.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="JBooth.MicroSplat.Core"><HintPath>$(FrozenManaged)/JBooth.MicroSplat.Core.dll</HintPath><Private>false</Private></Reference>
     <Reference Include="Sirenix.Serialization"><HintPath>$(FrozenManaged)/Sirenix.Serialization.dll</HintPath><Private>false</Private></Reference>
