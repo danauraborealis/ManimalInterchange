@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net10.0</TargetFramework><ImplicitUsings>enable</ImplicitUsings><AssemblyName>ManimalInterchange.Server</AssemblyName><Version>$(ModVersion)</Version></PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../interchange-shared/interchange-shared.csproj" />
+    <Reference Include="SPTarkov.Server.Core"><HintPath>$(ReferenceRoot)/SPT_Runtime/SPTarkov.Server.Core.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="SPTarkov.Common"><HintPath>$(ReferenceRoot)/SPT_Runtime/SPTarkov.Common.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="SPTarkov.DI"><HintPath>$(ReferenceRoot)/SPT_Runtime/SPTarkov.DI.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="SPTarkov.Reflection"><HintPath>$(ReferenceRoot)/SPT_Runtime/SPTarkov.Reflection.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="0Harmony"><HintPath>$(ReferenceRoot)/SPT_Runtime/0Harmony.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="JetBrains.Annotations"><HintPath>$(ReferenceRoot)/SPT_Runtime/JetBrains.Annotations.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="SemanticVersioning"><HintPath>$(ReferenceRoot)/SPT_Runtime/SemanticVersioning.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+</Project>

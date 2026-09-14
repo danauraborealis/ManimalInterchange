@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>netstandard2.1</TargetFramework><AssemblyName>ManimalInterchange.Shared</AssemblyName><Version>$(ModVersion)</Version></PropertyGroup>
+  <Target Name="GenerateModIdentity" BeforeTargets="CoreCompile">
+    <ItemGroup>
+      <_Identity Include="// Generated from Directory.Build.props." />
+      <_Identity Include="namespace Manimal.Interchange.Shared { public static class ModIdentity {" />
+      <_Identity Include="public const string Version = &quot;$(ModVersion)&quot;%3B" />
+      <_Identity Include="public const string Guid = &quot;$(ModGuid)&quot;%3B" />
+      <_Identity Include="public const string Author = &quot;$(ModUsername)&quot;%3B" />
+      <_Identity Include="public const string ClientName = &quot;$(ModClientName)&quot;%3B" />
+      <_Identity Include="public const string ServerName = &quot;$(ModServerName)&quot;%3B" />
+      <_Identity Include="public const string SourceUrl = &quot;$(ModSourceUrl)&quot;%3B" />
+      <_Identity Include="public const string TargetClientBuild = &quot;$(TargetClientBuild)&quot;%3B" />
+      <_Identity Include="public const string SupportedSptRange = &quot;$(SupportedSptRange)&quot;%3B" />
+      <_Identity Include="public const string ToolkitMinimumVersion = &quot;$(UnityToolkitMinimumVersion)&quot;%3B" />
+      <_Identity Include="} }" />
+    </ItemGroup>
+    <WriteLinesToFile File="$(IntermediateOutputPath)ModIdentity.g.cs" Lines="@(_Identity)" Overwrite="true" WriteOnlyWhenDifferent="true" />
+    <ItemGroup><Compile Include="$(IntermediateOutputPath)ModIdentity.g.cs" /></ItemGroup>
+  </Target>
+</Project>

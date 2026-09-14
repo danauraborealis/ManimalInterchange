@@ -1,0 +1,31 @@
+<Project>
+  <PropertyGroup>
+    <ModVersion>0.1.0</ModVersion>
+    <ModGuid>com.manimal.interchange</ModGuid>
+    <ModUsername>Manimal</ModUsername>
+    <ModDisplayName>InterchangeRework</ModDisplayName>
+    <ModClientName>$(ModUsername)-$(ModDisplayName)</ModClientName>
+    <ModServerName>$(ModUsername)$(ModDisplayName)</ModServerName>
+    <!-- No source repository has been supplied or published for this project. -->
+    <ModSourceUrl></ModSourceUrl>
+    <ModPackageName>$(ModUsername)-Interchange</ModPackageName>
+    <TargetClientBuild>0.16.9.40743</TargetClientBuild>
+    <SupportedSptRange>~4.1.5</SupportedSptRange>
+    <UnityToolkitMinimumVersion>2.0.2</UnityToolkitMinimumVersion>
+    <Authors>$(ModUsername)</Authors>
+    <RepositoryUrl>$(ModSourceUrl)</RepositoryUrl>
+    <PackageProjectUrl>$(ModSourceUrl)</PackageProjectUrl>
+    <Version>$(ModVersion)</Version>
+    <SPTPath Condition="'$(SPTPath)' == ''">D:\SPT41Dev</SPTPath>
+    <ServerPath>$(SPTPath)\SPT_Runtime</ServerPath>
+    <GameManaged>$(SPTPath)\EscapeFromTarkov_Data\Managed</GameManaged>
+    <ReferenceRoot Condition="'$(ReferenceRoot)' == ''">$(MSBuildThisFileDirectory)staging\target</ReferenceRoot>
+    <FrozenManaged>$(ReferenceRoot)\EscapeFromTarkov_Data\Managed</FrozenManaged>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <NuGetAudit>false</NuGetAudit>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <Deterministic>true</Deterministic>
+    <RestoreConfigFile>$(MSBuildThisFileDirectory)NuGet.Config</RestoreConfigFile>
+  </PropertyGroup>
+</Project>

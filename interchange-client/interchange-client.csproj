@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>netstandard2.1</TargetFramework><AssemblyName>ManimalInterchange</AssemblyName><Version>$(ModVersion)</Version></PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../interchange-shared/interchange-shared.csproj" />
+    <ProjectReference Include="../interchange-components/interchange-components.csproj" />
+    <Reference Include="BepInEx"><HintPath>$(ReferenceRoot)/BepInEx/core/BepInEx.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="0Harmony"><HintPath>$(ReferenceRoot)/BepInEx/core/0Harmony.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="spt-common"><HintPath>$(ReferenceRoot)/BepInEx/plugins/spt/spt-common.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="spt-reflection"><HintPath>$(ReferenceRoot)/BepInEx/plugins/spt/spt-reflection.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityToolkit"><HintPath>$(ReferenceRoot)/BepInEx/plugins/UnityToolkit/UnityToolkit.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UniTask"><HintPath>$(ReferenceRoot)/BepInEx/plugins/UnityToolkit/UniTask.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="ZLinq"><HintPath>$(ReferenceRoot)/BepInEx/plugins/UnityToolkit/ZLinq.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Assembly-CSharp"><HintPath>$(FrozenManaged)/Assembly-CSharp.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Meta.XR.Audio"><HintPath>$(FrozenManaged)/Meta.XR.Audio.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="JBooth.MicroSplat.Core"><HintPath>$(FrozenManaged)/JBooth.MicroSplat.Core.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Sirenix.Serialization"><HintPath>$(FrozenManaged)/Sirenix.Serialization.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Comfort"><HintPath>$(FrozenManaged)/Comfort.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Comfort.Unity"><HintPath>$(FrozenManaged)/Comfort.Unity.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Newtonsoft.Json"><HintPath>$(FrozenManaged)/Newtonsoft.Json.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine"><HintPath>$(FrozenManaged)/UnityEngine.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.CoreModule"><HintPath>$(FrozenManaged)/UnityEngine.CoreModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.PhysicsModule"><HintPath>$(FrozenManaged)/UnityEngine.PhysicsModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.TerrainModule"><HintPath>$(FrozenManaged)/UnityEngine.TerrainModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.TerrainPhysicsModule"><HintPath>$(FrozenManaged)/UnityEngine.TerrainPhysicsModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.AIModule"><HintPath>$(FrozenManaged)/UnityEngine.AIModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.AudioModule"><HintPath>$(FrozenManaged)/UnityEngine.AudioModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.AssetBundleModule"><HintPath>$(FrozenManaged)/UnityEngine.AssetBundleModule.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+</Project>

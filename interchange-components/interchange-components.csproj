@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <AssemblyName>ManimalInterchange.Components</AssemblyName>
+    <Version>$(ModVersion)</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="UnityEngine.CoreModule"><HintPath>$(FrozenManaged)/UnityEngine.CoreModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="ZLinq"><HintPath>$(ReferenceRoot)/BepInEx/plugins/UnityToolkit/ZLinq.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+</Project>

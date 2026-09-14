@@ -1,0 +1,23 @@
+# Publish only plugin source and the files needed to build it.
+# Analysis, tools, exports, captures, Unity workspaces, staging, docs,
+# verification evidence and generated content stay local, including any
+# new top-level working directories.
+/*
+!/.gitignore
+!/Directory.Build.props
+!/NuGet.Config
+!/README.md
+!/build.ps1
+!/interchange-client/
+!/interchange-server/
+!/interchange-shared/
+!/interchange-components/
+
+# Generated output and local IDE files within the plugin projects.
+**/bin/
+**/obj/
+**/__pycache__/
+**/.vs/
+**/.idea/
+*.user
+*.suo
