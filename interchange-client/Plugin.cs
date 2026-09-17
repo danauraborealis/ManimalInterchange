@@ -17,6 +17,7 @@ namespace Manimal.Interchange.Client;
 [BepInDependency("com.arys.unitytoolkit", ModIdentity.ToolkitMinimumVersion)]
 [BepInDependency("xyz.drakia.waypoints", BepInDependency.DependencyFlags.SoftDependency)]
 [BepInDependency("com.acidphantasm.botplacementsystem", BepInDependency.DependencyFlags.SoftDependency)]
+[BepInDependency("com.Amanda.Graphics", BepInDependency.DependencyFlags.SoftDependency)]
 public sealed class Plugin : BaseUnityPlugin
 {
     internal static string Root = "";
@@ -41,6 +42,7 @@ public sealed class Plugin : BaseUnityPlugin
     {
         Root = Path.GetDirectoryName(Info.Location)!;
         Log = Logger;
+        InterchangeAmandsCompatibility.EnableIfAvailable();
         AllowProbe = Config.Bind("Development", "AllowLoaderProbe", false, "Allow explicit menu-only scene loading tests through the AI Bridge.");
         AllowFullMapTest = Config.Bind("Development", "AllowFullMapTest", false, "Allow full replacement raids with a matching server test manifest.");
         RebindNativeShaders = Config.Bind("Rendering", "RebindNativeShaders", true, "Point the map's screen-space helper shaders (ambient, wet, tonemapper) at the game's own copies instead of the bundled retail programs.");

@@ -108,7 +108,8 @@ public sealed class InterchangeLocationBackport(
                 }
             }
 
-            var replacement = InterchangeLocationData.Read(root, manifest, json, combinedTemplates);
+            var baseline = Manimal.MapBackport.LegacyLootCompatibility.ReadBaseline(json, "interchange");
+            var replacement = InterchangeLocationData.Read(root, manifest, json, combinedTemplates, baseline);
             cancellationToken.ThrowIfCancellationRequested();
 
             _registration = Commit(
