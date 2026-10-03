@@ -6,6 +6,7 @@ param(
     [string]$SPTPath,
     [string]$AssetSourcePath,
     [string]$OutputDirectory,
+    [string[]]$UpdatedAssetPath = @(),
     [switch]$TestPackage,
     [switch]$Release,
     [switch]$UpdatePackage,
@@ -39,6 +40,7 @@ if ($PSVersionTable.PSVersion -lt [version]'7.2') {
     if ($PSBoundParameters.ContainsKey('SPTPath')) { $arguments += @('-SPTPath', $SPTPath) }
     if ($PSBoundParameters.ContainsKey('AssetSourcePath')) { $arguments += @('-AssetSourcePath', $AssetSourcePath) }
     if ($PSBoundParameters.ContainsKey('OutputDirectory')) { $arguments += @('-OutputDirectory', $OutputDirectory) }
+    if ($UpdatedAssetPath.Count) { throw 'Run PowerShell 7 directly when passing -UpdatedAssetPath.' }
     if ($TestPackage) { $arguments += '-TestPackage' }
     if ($Release) { $arguments += '-Release' }
     if ($UpdatePackage) { $arguments += '-UpdatePackage' }
@@ -146,6 +148,12 @@ foreach ($entry in @($manifest.Bundles) + @($manifest.Sidecars)) {
     Add-Input (Resolve-Payload $clientSource $entry.Path) "$clientRelative/$($entry.Path)" $entry.Sha256
     [void]$authoredPaths.Add("$clientRelative/$($entry.Path)")
 }
+$updatedAssets = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+foreach ($relative in $UpdatedAssetPath) {
+    $destination = "$clientRelative/$relative"
+    if (-not $authoredPaths.Contains($destination)) { throw "Updated asset is not declared in the content manifest: $relative" }
+    [void]$updatedAssets.Add($destination)
+}
 # Server db and item files are staged next to the bundles rather than kept in
 # the repo; the manifest hashes pin them to the same authoring pass.
 Write-Host 'Checking server database and item files...'
@@ -198,7 +206,8 @@ if ($StageOnly) { Write-Host "Verified package plan: $($packageFiles.Count) runt
 Add-Type -AssemblyName System.IO.Compression
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 $archivePaths = [Collections.Generic.List[string]]::new()
-# -UpdatePackage ships DLLs, database files and manifests only; the installed bundles and sidecars must already match.
+# Updated authored payloads must accompany their new manifest checksums.
+# Other bundles and sidecars must already match the installed base package.
 $archiveKinds = if ($UpdatePackage) { @('update') } else { @('full','update','binaries') }
 foreach ($kind in $archiveKinds) {
     $suffix = if ($kind -eq 'full') { '' } else { "-$kind" }
@@ -209,7 +218,7 @@ foreach ($kind in $archiveKinds) {
     $stream = [IO.File]::Open($zipPath, [IO.FileMode]::Create, [IO.FileAccess]::ReadWrite, [IO.FileShare]::None)
     $zip = [IO.Compression.ZipArchive]::new($stream, [IO.Compression.ZipArchiveMode]::Create)
     $selected = @($packageFiles | Where-Object {
-        $kind -eq 'full' -or ($kind -eq 'update' -and -not $authoredPaths.Contains($_.path)) -or ($kind -eq 'binaries' -and $_.path.EndsWith('.dll'))
+        $kind -eq 'full' -or ($kind -eq 'update' -and (-not $authoredPaths.Contains($_.path) -or $updatedAssets.Contains($_.path))) -or ($kind -eq 'binaries' -and $_.path.EndsWith('.dll'))
     })
     try {
         foreach ($entry in $selected) {
@@ -238,7 +247,7 @@ $archivePaths | ForEach-Object { '{0}  {1}' -f (Hash $_), [IO.Path]::GetFileName
 $report.status = 'passed'
 $report.readyToDeploy = $true
 $report | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $reportPath
-Write-Host "Packages verified in $OutputDirectory. Update ZIPs require the same authored bundles already installed."
+Write-Host "Packages verified in $OutputDirectory. Update ZIPs include $($updatedAssets.Count) updated authored payload(s); other authored payloads must already match."
 } catch {
     # Record the error before closing the transcript, then preserve a failing exit status.
     Write-Host ($_ | Out-String) -ForegroundColor Red

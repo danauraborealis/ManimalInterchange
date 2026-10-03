@@ -2,6 +2,14 @@
 
 Backport implementation in progress for replacing SPT 4.1.5's Interchange with the installed retail EFT 1.1.5.47242 map.
 
+Version 1.0.8 supports a separate server installation without `EscapeFromTarkov_Data`. The server validates the installed WTT assemblies, bundle catalog, and declared WTT bundle files and dependencies. Dependencies supplied by the game are resolved on the client; server startup no longer searches for a client game directory. The expanded navmesh from 1.0.7 is retained.
+
+Version 1.0.7 integrates the supplied expanded Interchange navmesh (4,940 tiles) into `manimal_interchange_assets_0e.bundle`. The existing AI scene reference and Waypoints compatibility remain in use. The supplied `interchange_navmesh.asset` has SHA-256 `139a6d198d104c8ffb92ca62bf7c51c85ce67ee94ce02e9a465abe353104afd4` and uses Unity 2022.3.43f1.
+
+After rebuilding the map bundles, run `integrate-navmesh.py` with Python and UnityPy 1.25.3, passing `--asset` for the supplied asset, `--bundle` for the processed `manimal_interchange_assets_0e.bundle`, `--output` for a separate output bundle, and `--report` for verification evidence. The tool preserves bundle object identity and checks every unrelated object and resource stream. Stage that output under the same bundle filename, update its `Sha256` and `Bytes` in both identical content manifests, and use the version from `Directory.Build.props`. Keep the retail source export immutable; repeat this step after every full-map rebuild. The supplied `.meta` GUID must not replace the map's existing GUID.
+
+The full package includes all map assets. When creating a smaller update package for this change, pass `-UpdatedAssetPath bundles/manimal_interchange_assets_0e.bundle` to `package-release.ps1` in PowerShell 7 so the changed bundle accompanies its new manifest. Expanded-navmesh packages remain test packages until bot navigation has been checked in a raid; static asset and Unity loading checks do not establish gameplay coverage.
+
 - [Complete backport plan](docs/INTERCHANGE-BACKPORT-PLAN.md)
 - [Implementation status and reproduction](docs/IMPLEMENTATION-STATUS.md)
 - [Full-map sky, cable, and outdoor audio corrections](docs/VISUAL-AUDIO-REPAIRS.md)

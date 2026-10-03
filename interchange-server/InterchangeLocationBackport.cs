@@ -353,18 +353,15 @@ public sealed class InterchangeLocationBackport(
     private sealed class WttBundleCatalog
     {
         private readonly string _bundleRoot;
-        private readonly string _streamingRoot;
         private readonly Dictionary<string, BundleEntry> _entries;
         private readonly Dictionary<string, bool> _prefabVerification = new(StringComparer.Ordinal);
         private readonly Dictionary<string, bool> _hashVerification = new(StringComparer.OrdinalIgnoreCase);
 
         private WttBundleCatalog(
             string bundleRoot,
-            string streamingRoot,
             Dictionary<string, BundleEntry> entries)
         {
             _bundleRoot = bundleRoot;
-            _streamingRoot = streamingRoot;
             _entries = entries;
         }
 
@@ -372,12 +369,6 @@ public sealed class InterchangeLocationBackport(
         {
             var modsRoot = Directory.GetParent(assemblyRoot)?.FullName
                 ?? throw new InvalidDataException("Unable to resolve the SPT mods directory.");
-            var userRoot = Directory.GetParent(modsRoot)?.FullName
-                ?? throw new InvalidDataException("Unable to resolve the SPT user directory.");
-            var runtimeRoot = Directory.GetParent(userRoot)?.FullName
-                ?? throw new InvalidDataException("Unable to resolve the SPT runtime directory.");
-            var installRoot = Directory.GetParent(runtimeRoot)?.FullName
-                ?? throw new InvalidDataException("Unable to resolve the SPT install directory.");
 
             var commonRoot = Path.Combine(modsRoot, "WTT-ServerCommonLib");
             var contentRoot = Path.Combine(modsRoot, "WTT-ContentBackport");
@@ -393,38 +384,8 @@ public sealed class InterchangeLocationBackport(
             }
 
             var bundleRoot = Path.Combine(contentRoot, "bundles");
-            var streamingRoot = ResolveStreamingRoot(installRoot, runtimeRoot);
             var entries = ReadEntries(bundlesPath);
-            return new WttBundleCatalog(bundleRoot, streamingRoot, entries);
-        }
-
-        private static string ResolveStreamingRoot(string installRoot, string runtimeRoot)
-        {
-            var installCandidate = Path.Combine(
-                installRoot,
-                "EscapeFromTarkov_Data",
-                "StreamingAssets",
-                "Windows");
-            if (Directory.Exists(installCandidate))
-            {
-                return installCandidate;
-            }
-
-            // Some development layouts put the game data below the SPT
-            // runtime directory.  Resolve that explicitly only when the
-            // canonical install-root location is absent.
-            var runtimeCandidate = Path.Combine(
-                runtimeRoot,
-                "EscapeFromTarkov_Data",
-                "StreamingAssets",
-                "Windows");
-            if (Directory.Exists(runtimeCandidate))
-            {
-                return runtimeCandidate;
-            }
-
-            throw new InvalidDataException(
-                "Target EscapeFromTarkov StreamingAssets/Windows directory is missing under the installed SPT roots.");
+            return new WttBundleCatalog(bundleRoot, entries);
         }
 
         public bool VerifyPrefab(string prefabPath)
@@ -501,16 +462,11 @@ public sealed class InterchangeLocationBackport(
                     continue;
                 }
 
-                // WTT's catalog names Unity-provided roots such as shaders,
-                // cubemaps, and defaultmaterial without declaring them in its
-                // own manifest.  Require the actual installed streaming file
-                // rather than treating the name as proof of availability.
-                if (!TryResolveStreaming(dependency, out var installedPath)
-                    || !VerifyHash(installedPath, null))
-                {
-                    visiting.Remove(key);
-                    return false;
-                }
+                // Dependencies outside WTT's catalog (such as shaders and
+                // defaultmaterial) are resolved by the game client. A separate
+                // server has no game installation to inspect. ReadDependencies
+                // still validates these keys; declared WTT bundles above must
+                // pass the server-side file and dependency checks.
             }
 
             visiting.Remove(key);
@@ -528,27 +484,6 @@ public sealed class InterchangeLocationBackport(
 
             var candidate = Path.GetFullPath(Path.Combine(_bundleRoot, key.Replace('/', Path.DirectorySeparatorChar)));
             var prefix = Path.GetFullPath(_bundleRoot).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
-                + Path.DirectorySeparatorChar;
-            if (!candidate.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)
-                || !File.Exists(candidate))
-            {
-                return false;
-            }
-
-            path = candidate;
-            return true;
-        }
-
-        private bool TryResolveStreaming(string key, out string path)
-        {
-            path = "";
-            if (!IsSafeKey(key))
-            {
-                return false;
-            }
-
-            var candidate = Path.GetFullPath(Path.Combine(_streamingRoot, key.Replace('/', Path.DirectorySeparatorChar)));
-            var prefix = Path.GetFullPath(_streamingRoot).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
                 + Path.DirectorySeparatorChar;
             if (!candidate.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)
                 || !File.Exists(candidate))
