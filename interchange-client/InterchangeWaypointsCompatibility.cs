@@ -15,13 +15,16 @@ namespace Manimal.Interchange.Client;
 internal static class InterchangeWaypointsCompatibility
 {
     private const string WaypointPatchTypeName = "DrakiaXYZ.Waypoints.Patches.WaypointPatch";
-    private static ModulePatch? _patch;
-    private static bool _initialized;
+    private static InjectNavmeshPatch? _patch;
 
     internal static void EnableIfAvailable()
     {
-        if (_initialized) return;
-        _initialized = true;
+        if (_patch is not null)
+        {
+            if (!_patch.IsActive) _patch.Enable();
+            return;
+        }
+
         var patchType = FindLoadedType(WaypointPatchTypeName);
         if (patchType is null) return;
         var inject = patchType.GetMethod("InjectNavmesh", BindingFlags.NonPublic | BindingFlags.Static, null, [typeof(GameWorld)], null);
@@ -33,6 +36,13 @@ internal static class InterchangeWaypointsCompatibility
         _patch = new InjectNavmeshPatch(inject);
         _patch.Enable();
         Plugin.Log.LogInfo("Interchange: Waypoints custom navmesh is skipped on the reworked Interchange; the scene's own navmesh is used.");
+    }
+
+    internal static void Disable()
+    {
+        if (_patch is null) return;
+        try { _patch.Disable(); }
+        catch (Exception error) { if (Plugin.Log != null) Plugin.Log.LogError("Interchange Waypoints patch teardown failed: " + error); }
     }
 
     private static Type? FindLoadedType(string fullName)
@@ -62,9 +72,11 @@ internal static class InterchangeWaypointsCompatibility
         return false;
     }
 
-    private sealed class InjectNavmeshPatch(MethodBase target) : ModulePatch
+    private sealed class InjectNavmeshPatch : ModulePatch
     {
-        protected override MethodBase GetTargetMethod() => target;
+        private readonly MethodBase _target;
+        internal InjectNavmeshPatch(MethodBase target) : base(PatchIdentity.For(typeof(InjectNavmeshPatch))) => _target = target;
+        protected override MethodBase GetTargetMethod() => _target;
 
         [PatchPrefix]
         private static bool Prefix(GameWorld gameWorld)

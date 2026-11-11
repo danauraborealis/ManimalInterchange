@@ -34,7 +34,6 @@ internal static class LevelLightingBindings
     private static readonly List<LevelLightingPolicy> Policies = new();
     private static readonly Dictionary<DistantShadow, ShadowClaim> Claims = new();
     private static bool _enabled;
-    private static bool _patchesEnabled;
 
     internal static int ActivePolicyCount => Policies.Count;
     internal static int TrackedShadowCount => Claims.Count;
@@ -47,14 +46,6 @@ internal static class LevelLightingBindings
         LevelLightingPolicy.Disabled += Unregister;
         LevelLightingPolicy.Destroyed += Unregister;
         SceneManager.sceneUnloaded += SceneUnloaded;
-        if (!_patchesEnabled)
-        {
-            new DistantShadowCacheParametersPatch().Enable();
-            new DistantShadowOrthoMatrixPatch().Enable();
-            new DistantShadowTransformPatch().Enable();
-            _patchesEnabled = true;
-        }
-
         // A scene can load before the client binding receives its first event.
         // Recover only active scene policies; Resources also returns prefab
         // assets, which are intentionally ignored here.
@@ -216,6 +207,7 @@ internal static class LevelLightingBindings
 
 internal sealed class DistantShadowCacheParametersPatch : ModulePatch
 {
+    internal DistantShadowCacheParametersPatch() : base(PatchIdentity.For(typeof(DistantShadowCacheParametersPatch))) { }
     protected override MethodBase GetTargetMethod()
     {
         var method = AccessTools.Method(typeof(DistantShadow), "CacheParameters", new[] { typeof(int) });
@@ -229,6 +221,7 @@ internal sealed class DistantShadowCacheParametersPatch : ModulePatch
 
 internal sealed class DistantShadowOrthoMatrixPatch : ModulePatch
 {
+    internal DistantShadowOrthoMatrixPatch() : base(PatchIdentity.For(typeof(DistantShadowOrthoMatrixPatch))) { }
     protected override MethodBase GetTargetMethod()
     {
         var method = AccessTools.Method(typeof(DistantShadow), "GetOrthoMatrix", Type.EmptyTypes);
@@ -242,6 +235,7 @@ internal sealed class DistantShadowOrthoMatrixPatch : ModulePatch
 
 internal sealed class DistantShadowTransformPatch : ModulePatch
 {
+    internal DistantShadowTransformPatch() : base(PatchIdentity.For(typeof(DistantShadowTransformPatch))) { }
     protected override MethodBase GetTargetMethod()
     {
         var method = AccessTools.Method(typeof(DistantShadow), "method_13", Type.EmptyTypes);

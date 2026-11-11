@@ -162,6 +162,7 @@ internal static class SyncLoopBindings
 
 internal sealed class SyncLoopInitPatch : ModulePatch
 {
+    internal SyncLoopInitPatch() : base(PatchIdentity.For(typeof(SyncLoopInitPatch))) { }
     protected override MethodBase GetTargetMethod() => AccessTools.Method(typeof(NativeLoop), "method_0");
     [PatchPrefix]
     private static bool Prefix(NativeLoop __instance)
@@ -169,6 +170,7 @@ internal sealed class SyncLoopInitPatch : ModulePatch
 }
 internal sealed class SyncLoopPlayPatch : ModulePatch
 {
+    internal SyncLoopPlayPatch() : base(PatchIdentity.For(typeof(SyncLoopPlayPatch))) { }
     protected override MethodBase GetTargetMethod() => AccessTools.Method(typeof(NativeLoop), "Play");
     [PatchPrefix]
     private static bool Prefix(NativeLoop __instance)
@@ -176,6 +178,7 @@ internal sealed class SyncLoopPlayPatch : ModulePatch
 }
 internal sealed class SyncLoopStopPatch : ModulePatch
 {
+    internal SyncLoopStopPatch() : base(PatchIdentity.For(typeof(SyncLoopStopPatch))) { }
     protected override MethodBase GetTargetMethod() => AccessTools.Method(typeof(NativeLoop), "Stop");
     [PatchPrefix]
     private static bool Prefix(NativeLoop __instance)

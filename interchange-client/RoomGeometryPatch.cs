@@ -10,6 +10,7 @@ namespace Manimal.Interchange.Client;
 
 internal sealed class RoomGeometryPatch : ModulePatch
 {
+    internal RoomGeometryPatch() : base(PatchIdentity.For(typeof(RoomGeometryPatch))) { }
     internal static MethodInfo QueryMethod => AccessTools.Method(
         typeof(SpatialAudioRoom).Assembly.GetType("Audio.SpatialSystem.AudioRoomStorage", true),
         "CheckPositionInsideRoom", new[] { typeof(ISpatialAudioRoom), typeof(Vector3) });

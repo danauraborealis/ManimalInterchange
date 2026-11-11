@@ -82,6 +82,7 @@ internal static class AreaLightBindings
 
 internal sealed class AreaLightInitPatch : ModulePatch
 {
+    internal AreaLightInitPatch() : base(PatchIdentity.For(typeof(AreaLightInitPatch))) { }
     protected override MethodBase GetTargetMethod() => AccessTools.Method(typeof(AreaLight), "Init", Type.EmptyTypes);
     [PatchPrefix]
     private static void Prefix(AreaLight __instance) => AreaLightBindings.BeforeInit(__instance);

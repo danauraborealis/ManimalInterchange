@@ -151,6 +151,7 @@ internal static class FlareExitBindings
 
 internal sealed class FlareExitEventPatch : ModulePatch
 {
+    internal FlareExitEventPatch() : base(PatchIdentity.For(typeof(FlareExitEventPatch))) { }
     protected override MethodBase GetTargetMethod() => AccessTools.Method(typeof(PlayersWithImmuneToSniperFireCollector), "method_0");
     [PatchPrefix]
     private static bool Prefix(PlayersWithImmuneToSniperFireCollector __instance, FlareShootZoneEvent __0)
@@ -159,6 +160,7 @@ internal sealed class FlareExitEventPatch : ModulePatch
 
 internal sealed class FlareExitQueuedNotificationPatch : ModulePatch
 {
+    internal FlareExitQueuedNotificationPatch() : base(PatchIdentity.For(typeof(FlareExitQueuedNotificationPatch))) { }
     protected override MethodBase GetTargetMethod() => AccessTools.Method(typeof(NotifierView), "ShowNotification");
     [PatchPrefix]
     private static bool Prefix(Notification __0, ref bool __result)

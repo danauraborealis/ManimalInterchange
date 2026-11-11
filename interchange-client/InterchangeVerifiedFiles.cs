@@ -18,6 +18,11 @@ internal static class InterchangeVerifiedFiles
     private static readonly object CacheLock = new();
     private static readonly HashSet<VerificationKey> Verified = new();
 
+    internal static void Clear()
+    {
+        lock (CacheLock) Verified.Clear();
+    }
+
     internal static void Verify(
         string root,
         PayloadFile file,

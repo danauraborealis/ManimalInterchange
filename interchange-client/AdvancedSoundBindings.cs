@@ -76,6 +76,7 @@ internal static class AdvancedSoundBindings
 
 internal sealed class AdvancedSoundPolicyPatch : ModulePatch
 {
+    internal AdvancedSoundPolicyPatch() : base(PatchIdentity.For(typeof(AdvancedSoundPolicyPatch))) { }
     protected override MethodBase GetTargetMethod() => AccessTools.Method(typeof(HandlerPlaySoundAdvanced), "PlaySound", new[] { typeof(HandlerPlaySoundAdvanced.PlaySoundConfig) });
     [PatchPrefix]
     private static void Prefix(HandlerPlaySoundAdvanced __instance, HandlerPlaySoundAdvanced.PlaySoundConfig __0) => AdvancedSoundBindings.Before(__instance, __0);

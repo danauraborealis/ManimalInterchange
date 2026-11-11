@@ -119,6 +119,7 @@ internal static class SeasonBindings
 
 internal sealed class TerrainSeasonPatch : ModulePatch
 {
+    internal TerrainSeasonPatch() : base(PatchIdentity.For(typeof(TerrainSeasonPatch))) { }
     protected override MethodBase GetTargetMethod() => AccessTools.Method(typeof(MicroSplatTerrain), "ApplySeasonMaterial", Type.EmptyTypes);
     [PatchPrefix]
     private static void Prefix(MicroSplatTerrain __instance) => SeasonBindings.BeforeTerrainSeason(__instance);

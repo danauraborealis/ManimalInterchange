@@ -10,6 +10,7 @@ namespace Manimal.Interchange.Client;
 
 internal sealed class CloudLayerPatch : ModulePatch
 {
+    internal CloudLayerPatch() : base(PatchIdentity.For(typeof(CloudLayerPatch))) { }
     internal static readonly Type ControllerType = typeof(GameWorld).Assembly.GetType("EFT.Rendering.Clouds.CloudController", true);
     internal static readonly FieldInfo Renderer = AccessTools.Field(ControllerType, "_renderer");
     internal static readonly Type RendererType = Renderer.FieldType;

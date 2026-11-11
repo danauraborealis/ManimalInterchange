@@ -79,6 +79,7 @@ internal static class WaterRendererBindings
 /// </summary>
 internal sealed class WaterRendererPatch : ModulePatch
 {
+    internal WaterRendererPatch() : base(PatchIdentity.For(typeof(WaterRendererPatch))) { }
     protected override MethodBase GetTargetMethod() => AccessTools.Method(typeof(WaterRendererv3), "OnEnable", Type.EmptyTypes)
         ?? throw new MissingMethodException(typeof(WaterRendererv3).FullName, "OnEnable");
 

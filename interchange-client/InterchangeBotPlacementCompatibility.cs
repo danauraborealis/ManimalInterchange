@@ -21,18 +21,22 @@ internal static class InterchangeBotPlacementCompatibility
     private const string NonWavesPatchTypeName = "BotPlacementSystemClient.Patches.NonWavesSpawnSystemPatch";
 
     private static FieldInfo? _cachedNonSnipeZones;
-    private static ModulePatch? _nonWavesZonePatch;
-    private static ModulePatch? _spawnCachePatch;
-    private static bool _initialized;
+    private static NonWavesZonePatch? _nonWavesZonePatch;
+    private static SpawnCachePatch? _spawnCachePatch;
+    // Track only the BotZone instances this compatibility layer adds. BPS owns
+    // this process-wide list too, so teardown must not clear or restore entries
+    // written by BPS or another map after our scene has gone away.
+    private static readonly HashSet<BotZone> OwnedZones = new();
 
     internal static void EnableIfAvailable()
     {
-        if (_initialized)
+        if (_nonWavesZonePatch is not null || _spawnCachePatch is not null)
         {
+            if (_nonWavesZonePatch is not null && !_nonWavesZonePatch.IsActive) _nonWavesZonePatch.Enable();
+            if (_spawnCachePatch is not null && !_spawnCachePatch.IsActive) _spawnCachePatch.Enable();
             return;
         }
 
-        _initialized = true;
         var utilityType = FindLoadedType(UtilityTypeName);
         if (utilityType is null)
         {
@@ -99,6 +103,44 @@ internal static class InterchangeBotPlacementCompatibility
         }
 
         Plugin.Log.LogInfo("Interchange: BPS client scav selectors use Interchange _openedZones; dedicated boss zones remain available to boss spawning.");
+    }
+
+    internal static void Disable()
+    {
+        TryDisable(_spawnCachePatch);
+        TryDisable(_nonWavesZonePatch);
+        ReleaseOwnedZoneCache();
+    }
+
+    private static void ReleaseOwnedZoneCache()
+    {
+        try
+        {
+            if (_cachedNonSnipeZones?.GetValue(null) is List<BotZone> cache)
+            {
+                for (var index = cache.Count - 1; index >= 0; index--)
+                {
+                    if (OwnedZones.Contains(cache[index])) cache.RemoveAt(index);
+                }
+            }
+        }
+        catch (Exception error)
+        {
+            if (Plugin.Log != null) Plugin.Log.LogError("Interchange BPS zone-cache teardown failed: " + error);
+        }
+        finally
+        {
+            // Even if BPS replaced its cache or reflection became invalid,
+            // never retain scene objects in this compatibility layer.
+            OwnedZones.Clear();
+        }
+    }
+
+    private static void TryDisable(ModulePatch? patch)
+    {
+        if (patch is null || !patch.IsActive) return;
+        try { patch.Disable(); }
+        catch (Exception error) { if (Plugin.Log != null) Plugin.Log.LogError("Interchange BPS patch teardown failed: " + error); }
     }
 
     private static Type? FindLoadedType(string fullName)
@@ -171,14 +213,27 @@ internal static class InterchangeBotPlacementCompatibility
             return false;
         }
 
-        if (_cachedNonSnipeZones.GetValue(null) is List<BotZone> cache)
+        var cache = _cachedNonSnipeZones.GetValue(null) as List<BotZone>;
+        if (cache is null)
         {
-            cache.Clear();
-            cache.AddRange(zones);
+            cache = new List<BotZone>();
+            _cachedNonSnipeZones.SetValue(null, cache);
         }
-        else
+
+        // Remove only the prior Interchange contribution. This leaves BPS's
+        // own entries and any later map's entries intact if a scene transition
+        // races with compatibility teardown.
+        for (var index = cache.Count - 1; index >= 0; index--)
         {
-            _cachedNonSnipeZones.SetValue(null, zones);
+            if (OwnedZones.Contains(cache[index])) cache.RemoveAt(index);
+        }
+        OwnedZones.Clear();
+
+        foreach (var zone in zones)
+        {
+            if (cache.Contains(zone)) continue;
+            cache.Add(zone);
+            OwnedZones.Add(zone);
         }
 
         return true;
@@ -199,9 +254,11 @@ internal static class InterchangeBotPlacementCompatibility
         return false;
     }
 
-    private sealed class NonWavesZonePatch(MethodBase target) : ModulePatch
+    private sealed class NonWavesZonePatch : ModulePatch
     {
-        protected override MethodBase GetTargetMethod() => target;
+        private readonly MethodBase _target;
+        internal NonWavesZonePatch(MethodBase target) : base(PatchIdentity.For(typeof(NonWavesZonePatch))) => _target = target;
+        protected override MethodBase GetTargetMethod() => _target;
 
         [PatchPrefix]
         private static void Prefix(ref BotZone[] allZones, BotsController _botsController)
@@ -236,9 +293,11 @@ internal static class InterchangeBotPlacementCompatibility
         }
     }
 
-    private sealed class SpawnCachePatch(MethodBase target) : ModulePatch
+    private sealed class SpawnCachePatch : ModulePatch
     {
-        protected override MethodBase GetTargetMethod() => target;
+        private readonly MethodBase _target;
+        internal SpawnCachePatch(MethodBase target) : base(PatchIdentity.For(typeof(SpawnCachePatch))) => _target = target;
+        protected override MethodBase GetTargetMethod() => _target;
 
         [HarmonyPriority(Priority.First)]
         [PatchPrefix]

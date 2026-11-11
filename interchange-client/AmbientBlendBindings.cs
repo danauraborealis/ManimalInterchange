@@ -718,7 +718,6 @@ internal static class AmbientBlendBindings
 
     internal static readonly Dictionary<AmbientBlendPolicy, BlenderBinding> BlenderBindings = new();
     internal static readonly Dictionary<AmbientBlendPolicy, SystemBinding> SystemBindings = new();
-    private static AmbientBlendSystemInitPatch? _initPatch;
     private static bool _enabled;
     internal static int BlenderCount => BlenderBindings.Count;
     internal static int SystemCount => SystemBindings.Count;
@@ -730,15 +729,12 @@ internal static class AmbientBlendBindings
         AmbientBlendPolicy.Created += Register;
         AmbientBlendPolicy.Enabled += Retry;
         AmbientBlendPolicy.Destroyed += Remove;
-        _initPatch ??= new AmbientBlendSystemInitPatch();
-        _initPatch.Enable();
         _enabled = true;
     }
 
     internal static void Disable()
     {
         _enabled = false;
-        _initPatch?.Disable();
         AmbientBlendPolicy.Created -= Register;
         AmbientBlendPolicy.Enabled -= Retry;
         AmbientBlendPolicy.Destroyed -= Remove;
@@ -815,6 +811,7 @@ internal static class AmbientBlendBindings
 /// </summary>
 internal sealed class AmbientBlendSystemInitPatch : ModulePatch
 {
+    internal AmbientBlendSystemInitPatch() : base(PatchIdentity.For(typeof(AmbientBlendSystemInitPatch))) { }
     protected override MethodBase GetTargetMethod()
         => AccessTools.Method(typeof(EnvironmentSoundBlendSystem), nameof(EnvironmentSoundBlendSystem.Init));
 

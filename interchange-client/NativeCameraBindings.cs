@@ -39,6 +39,7 @@ internal static class NativeCameraBindings
 
 internal sealed class NativeCameraPrefabPatch : ModulePatch
 {
+    internal NativeCameraPrefabPatch() : base(PatchIdentity.For(typeof(NativeCameraPrefabPatch))) { }
     protected override MethodBase GetTargetMethod() => AccessTools.Method(typeof(LevelSettings), "Awake");
     [PatchPrefix]
     private static void Prefix(LevelSettings __instance) => NativeCameraBindings.Apply(__instance);

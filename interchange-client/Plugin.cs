@@ -42,42 +42,12 @@ public sealed class Plugin : BaseUnityPlugin
     {
         Root = Path.GetDirectoryName(Info.Location)!;
         Log = Logger;
-        InterchangeAmandsCompatibility.EnableIfAvailable();
         AllowProbe = Config.Bind("Development", "AllowLoaderProbe", false, "Allow explicit menu-only scene loading tests through the AI Bridge.");
         AllowFullMapTest = Config.Bind("Development", "AllowFullMapTest", false, "Allow full replacement raids with a matching server test manifest.");
         RebindNativeShaders = Config.Bind("Rendering", "RebindNativeShaders", true, "Point the map's screen-space helper shaders (ambient, wet, tonemapper) at the game's own copies instead of the bundled retail programs.");
         RebindMaterialShaders = Config.Bind("Rendering", "RebindMaterialShaders", true, "Point map materials at the game's own shader of the same name where one exists.");
-        new LoadPresetReversePatch().Enable();
-        new LoadPresetPatch().Enable();
-        new BundledScenePatch().Enable();
-        new CullingSidecarPatch().Enable();
-        new AudioBakeSidecarPatch().Enable();
-        new AcousticMapPathPatch().Enable();
-        new AcousticMapLoadPatch().Enable();
-        new AcousticGeometryPathPatch().Enable();
-        new AcousticGeometryLoadPatch().Enable();
-        new RoomGeometryPatch().Enable();
-        new AreaLightInitPatch().Enable();
-        new TerrainSeasonPatch().Enable();
-        new BallisticTriggerPatch().Enable();
-        new CloudLayerPatch().Enable();
-        new EffectSoundPolicyPatch().Enable();
-        new DistanceAudioFadePatch().Enable();
-        new OwnedSoundGagPatch().Enable();
-        new AdvancedSoundPolicyPatch().Enable();
-        new FlareExitEventPatch().Enable();
-        new FlareExitQueuedNotificationPatch().Enable();
-        new DoorRelatedTriggerPatch().Enable();
-        new KeycardOperationPolicyPatch().Enable();
-        new SwitchInteractionLogPatch().Enable();
-        new SyncLoopInitPatch().Enable();
-        new SyncLoopPlayPatch().Enable();
-        new SyncLoopStopPatch().Enable();
-        new WaterRendererPatch().Enable();
-        new DistantShadowCacheParametersPatch().Enable();
-        new DistantShadowOrthoMatrixPatch().Enable();
-        new DistantShadowTransformPatch().Enable();
-        new NativeCameraPrefabPatch().Enable();
+        SceneLoader.Initialize();
+        InterchangePatchLifecycle.EnablePresetHooks();
         SyncLoopBindings.Enable();
         EnvironmentAudioBindings.Enable();
         AmbientBlendBindings.Enable();
@@ -91,8 +61,6 @@ public sealed class Plugin : BaseUnityPlugin
         NativeShaderBindings.Enable();
         SceneManager.sceneUnloaded += AreaLightBindings.SceneUnloaded;
         SceneManager.sceneUnloaded += SceneLoader.SceneUnloaded;
-        InterchangeWaypointsCompatibility.EnableIfAvailable();
-        InterchangeBotPlacementCompatibility.EnableIfAvailable();
         Log.LogInfo(ModIdentity.ClientName + " " + ModIdentity.Version + ": replacement content requires a matching server manifest.");
     }
 
@@ -493,6 +461,12 @@ public sealed class Plugin : BaseUnityPlugin
     private void OnDestroy()
     {
         _probeCancellation?.Cancel();
+        SceneLoader.Teardown(DisableRuntimeBindings);
+    }
+
+    private static void DisableRuntimeBindings()
+    {
+        InterchangePatchLifecycle.DisablePresetHooks();
         SeasonBindings.Disable();
         TriggerRelayBindings.Disable();
         AudioBindings.Disable();

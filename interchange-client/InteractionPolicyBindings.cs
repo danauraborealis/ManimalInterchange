@@ -46,6 +46,7 @@ internal static class InteractionPolicyBindings
 
 internal sealed class DoorRelatedTriggerPatch : ModulePatch
 {
+    internal DoorRelatedTriggerPatch() : base(PatchIdentity.For(typeof(DoorRelatedTriggerPatch))) { }
     protected override MethodBase GetTargetMethod() => AccessTools.Method(typeof(WorldInteractiveObject), "OnAwake");
     [PatchPostfix]
     private static void Postfix(WorldInteractiveObject __instance)
@@ -56,6 +57,7 @@ internal sealed class DoorRelatedTriggerPatch : ModulePatch
 
 internal sealed class KeycardOperationPolicyPatch : ModulePatch
 {
+    internal KeycardOperationPolicyPatch() : base(PatchIdentity.For(typeof(KeycardOperationPolicyPatch))) { }
     protected override MethodBase GetTargetMethod() => AccessTools.Method(typeof(KeycardDoor), "UnlockCoroutine");
     [PatchPostfix]
     private static void Postfix(KeycardDoor __instance, ref IEnumerator __result)
@@ -67,6 +69,7 @@ internal sealed class KeycardOperationPolicyPatch : ModulePatch
 
 internal sealed class SwitchInteractionLogPatch : ModulePatch
 {
+    internal SwitchInteractionLogPatch() : base(PatchIdentity.For(typeof(SwitchInteractionLogPatch))) { }
     protected override MethodBase GetTargetMethod() => AccessTools.Method(typeof(Switch), "Interact", new[] { typeof(InteractionResult) });
     [PatchPrefix]
     private static void Prefix(Switch __instance, InteractionResult __0)

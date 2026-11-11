@@ -11,6 +11,7 @@ namespace Manimal.Interchange.Client;
 
 internal sealed class BallisticTriggerPatch : ModulePatch
 {
+    internal BallisticTriggerPatch() : base(PatchIdentity.For(typeof(BallisticTriggerPatch))) { }
     protected override MethodBase GetTargetMethod() => AccessTools.Method(typeof(TriggerBallistic), "CG_Start", new[] { typeof(DamageInfo) });
 
     [PatchPrefix]

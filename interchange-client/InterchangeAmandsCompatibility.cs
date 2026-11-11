@@ -15,9 +15,18 @@ internal static class InterchangeAmandsCompatibility
     private const string NativeScene = "Shopping_Mall_Scripts";
     private static FieldInfo? _sceneNames;
     private static FieldInfo? _scene;
+    private static ActivationPatch? _activationPatch;
+    private static UpdatePatch? _updatePatch;
 
     internal static void EnableIfAvailable()
     {
+        if (_activationPatch is not null || _updatePatch is not null)
+        {
+            _activationPatch?.EnableIfInactive();
+            _updatePatch?.EnableIfInactive();
+            return;
+        }
+
         var type = AccessTools.TypeByName("AmandsGraphics.AmandsGraphicsClass");
         if (type is null) return;
         _sceneNames = AccessTools.Field(type, "sceneLevelSettings");
@@ -30,8 +39,31 @@ internal static class InterchangeAmandsCompatibility
             Plugin.Log.LogWarning("Interchange: unrecognized Amands scene API; compatibility patches were not installed.");
             return;
         }
-        new ActivationPatch(activate).Enable();
-        new UpdatePatch(update).Enable();
+        _activationPatch = new ActivationPatch(activate);
+        _updatePatch = new UpdatePatch(update);
+        try
+        {
+            _activationPatch.Enable();
+            _updatePatch.Enable();
+        }
+        catch
+        {
+            Disable();
+            throw;
+        }
+    }
+
+    internal static void Disable()
+    {
+        TryDisable(_updatePatch);
+        TryDisable(_activationPatch);
+    }
+
+    private static void TryDisable(ModulePatch? patch)
+    {
+        if (patch is null) return;
+        try { patch.Disable(); }
+        catch (Exception error) { if (Plugin.Log != null) Plugin.Log.LogError("Interchange Amands patch teardown failed: " + error); }
     }
 
     private static bool OwnsActiveScene()
@@ -40,9 +72,12 @@ internal static class InterchangeAmandsCompatibility
         return scene.name == NativeScene + "_MI" && SceneLoader.Owns(scene.path);
     }
 
-    private sealed class ActivationPatch(MethodBase target) : ModulePatch
+    private sealed class ActivationPatch : ModulePatch
     {
-        protected override MethodBase GetTargetMethod() => target;
+        private readonly MethodBase _target;
+        internal ActivationPatch(MethodBase target) : base(PatchIdentity.For(typeof(ActivationPatch))) => _target = target;
+        protected override MethodBase GetTargetMethod() => _target;
+        internal void EnableIfInactive() { if (!IsActive) Enable(); }
         [PatchPrefix]
         private static void Prefix(object __instance)
         {
@@ -53,9 +88,12 @@ internal static class InterchangeAmandsCompatibility
         }
     }
 
-    private sealed class UpdatePatch(MethodBase target) : ModulePatch
+    private sealed class UpdatePatch : ModulePatch
     {
-        protected override MethodBase GetTargetMethod() => target;
+        private readonly MethodBase _target;
+        internal UpdatePatch(MethodBase target) : base(PatchIdentity.For(typeof(UpdatePatch))) => _target = target;
+        protected override MethodBase GetTargetMethod() => _target;
+        internal void EnableIfInactive() { if (!IsActive) Enable(); }
         [PatchPrefix]
         private static void Prefix(object __instance)
         {

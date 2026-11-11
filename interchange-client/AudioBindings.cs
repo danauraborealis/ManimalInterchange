@@ -112,7 +112,13 @@ internal static class AudioBindings
         AudioCatalog.Disabled -= OnDisable;
         AudioCatalog.Destroyed -= Remove;
         foreach (var owner in Catalogs.Keys.AsValueEnumerable().ToArray()) Remove(owner);
+        ReleaseRaid();
     }
+
+    // BetterAudio owns the source lifetime. This is only a diagnostic handle,
+    // so release it at raid teardown even while the global audio bindings stay
+    // subscribed for the next raid.
+    internal static void ReleaseRaid() => LastSource = null;
     private static void Register(AudioCatalog catalog)
     {
         if (catalog.LimitedBanks.Length != catalog.LimitIfVisible.Length || catalog.LimitedBanks.Length != catalog.LimitRadius.Length ||
@@ -142,6 +148,7 @@ internal static class AudioBindings
         foreach (var item in catalog.LimitedBanks) if (item is SoundBank bank && Policies.TryGetValue(bank, out var policy) && policy.Owner == binding) Policies.Remove(bank);
         foreach (var item in catalog.BlendProfiles) if (item is DistanceBlendOptions blend && Blends.TryGetValue(blend, out var policy) && policy.Owner == catalog) Blends.Remove(blend);
         Catalogs.Remove(catalog);
+        if (Catalogs.Count == 0) ReleaseRaid();
     }
     internal static void Dispatch(Effect effect, Vector3 position, float distance, float volume, bool firstPerson, bool melee, bool visible)
     {
@@ -160,6 +167,7 @@ internal static class AudioBindings
 
 internal sealed class EffectSoundPolicyPatch : ModulePatch
 {
+    internal EffectSoundPolicyPatch() : base(PatchIdentity.For(typeof(EffectSoundPolicyPatch))) { }
     protected override MethodBase GetTargetMethod() => AccessTools.Method(typeof(Effect), "Emit");
     [PatchTranspiler]
     private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> source, MethodBase original)
@@ -188,6 +196,7 @@ internal sealed class EffectSoundPolicyPatch : ModulePatch
 
 internal sealed class DistanceAudioFadePatch : ModulePatch
 {
+    internal DistanceAudioFadePatch() : base(PatchIdentity.For(typeof(DistanceAudioFadePatch))) { }
     protected override MethodBase GetTargetMethod() => AccessTools.Method(typeof(SoundBank), "PickClipsByDistance");
     [PatchPostfix]
     private static void Postfix(SoundBank __instance, ref float __2)
@@ -198,6 +207,7 @@ internal sealed class DistanceAudioFadePatch : ModulePatch
 
 internal sealed class OwnedSoundGagPatch : ModulePatch
 {
+    internal OwnedSoundGagPatch() : base(PatchIdentity.For(typeof(OwnedSoundGagPatch))) { }
     protected override MethodBase GetTargetMethod() => AccessTools.Method(typeof(Gag), "IsChoked");
     [PatchPrefix]
     private static bool Prefix(Gag __instance, Vector3 __0, Vector3 __1, float __2, ref bool __result)
