@@ -1,6 +1,6 @@
 ﻿<Project>
   <PropertyGroup>
-    <ModVersion>1.0.9</ModVersion>
+    <ModVersion>1.0.10</ModVersion>
     <ModGuid>com.manimal.interchange</ModGuid>
     <ModUsername>Manimal</ModUsername>
     <ModDisplayName>InterchangeRework</ModDisplayName>
